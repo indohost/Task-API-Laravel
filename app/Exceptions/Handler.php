@@ -2,11 +2,10 @@
 
 namespace App\Exceptions;
 
-use App\Constants\AuthConstants;
+use App\Constants\HandlerConstants;
 use App\Traits\ResponseTrait;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpFoundation\Response as HTTPCode;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -36,7 +35,7 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($exception instanceof ValidationException) {
-            return $this->validationFailedResponse(AuthConstants::VALIDATION_ERRORS, $exception->errors());
+            return $this->validationFailedResponse(HandlerConstants::VALIDATION_ERRORS, $exception->errors());
         }
 
         return parent::render($request, $exception);

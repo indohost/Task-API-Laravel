@@ -17,5 +17,4 @@ class AuthConstants
     public const TOKEN_NOT_PROVIDED = 'Token is not provided';
     public const TOKEN_INVALID = 'Token is invalid';
     public const TOKEN_EXPIRED = 'Token has expired';
-    public const VALIDATION_ERRORS = 'Validation errors occurred';
 }

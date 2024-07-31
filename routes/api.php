@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,9 +31,28 @@ Route::controller(AuthController::class)
         Route::post('login', 'login')->name('login');
         Route::post('register', 'register')->name('register');
 
-        Route::middleware(['jwt.verify'])->group(function () {
-            Route::get('me', 'me')->name('me');
-            Route::get('refresh', 'refresh')->name('refresh');
-            Route::post('logout', 'logout')->name('logout');
-        });
+        Route::middleware(['jwt.verify'])
+            ->group(function () {
+                Route::get('me', 'me')->name('me');
+                Route::get('refresh', 'refresh')->name('refresh');
+                Route::post('logout', 'logout')->name('logout');
+            });
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Task
+|--------------------------------------------------------------------------
+*/
+Route::controller(TaskController::class)
+    ->prefix('task')
+    ->name('task.')
+    ->middleware(['jwt.verify'])
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{id}', 'show')->name('show');
+
+        Route::patch('/{id}', 'update')->name('update');
+        Route::delete('/{id}', 'destroy')->name('destroy');
     });
