@@ -91,8 +91,8 @@ trait ResponseTrait
      * @return JsonResponse
      */
     protected function validationFailedResponse(
-        string $message = 'Validation failed',
-        array $errors
+        string $message = 'Validation errors occurred',
+        array $errors = []
     ): JsonResponse {
         $status = HTTPCode::HTTP_UNPROCESSABLE_ENTITY;
 
