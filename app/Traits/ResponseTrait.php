@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Symfony\Component\HttpFoundation\Response as HTTPCode;
 
 trait ResponseTrait
@@ -42,7 +43,7 @@ trait ResponseTrait
     protected function successResponse(
         ?string $message,
         int $status = HTTPCode::HTTP_OK,
-        array $data = []
+        $data = []
     ): JsonResponse {
 
         $response = [
@@ -50,8 +51,30 @@ trait ResponseTrait
             'message' => $message,
         ];
 
-        if (!empty($data)) {
-            $response['data'] = $data;
+        if ($data instanceof LengthAwarePaginator) {
+            $pagination = [
+                'current_page' => $data->currentPage(),
+                'data' => $data->items(),
+                'first_page_url' => $data->url(1),
+                'from' => $data->firstItem(),
+                'last_page' => $data->lastPage(),
+                'last_page_url' => $data->url($data->lastPage()),
+                'links' => $data->linkCollection()->toArray(),
+                'next_page_url' => $data->nextPageUrl(),
+                'path' => $data->path(),
+                'per_page' => $data->perPage(),
+                'prev_page_url' => $data->previousPageUrl(),
+                'to' => $data->lastItem(),
+                'total' => $data->total(),
+            ];
+
+            $response['pagination'] = $pagination;
+
+            $data = $data->items();
+        } else {
+            if (!empty($data)) {
+                $response['data'] = $data;
+            }
         }
 
         return response()->json($response, $status);
