@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\AuthConstants;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,29 +12,44 @@ use Symfony\Component\HttpFoundation\Response as HTTPCode;
 
 class AuthController extends Controller
 {
+    /**
+     *
+     * @return void
+     */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'logout']]);
+        $this->middleware('jwt.verify', ['except' => ['login', 'register']]);
     }
 
+    /**
+     * Get a JWT via given credentials.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function login(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|string|email',
-            'password' => 'required|string',
+            'password' => 'required|string|min:6',
         ]);
+
         $credentials = $request->only('email', 'password');
 
         $token = Auth::attempt($credentials);
         if (!$token) {
-            return $this->failedResponse('Unauthorized', HTTPCode::HTTP_UNAUTHORIZED);
+            return $this->failedResponse(AuthConstants::UNAUTHORIZED, HTTPCode::HTTP_UNAUTHORIZED);
         }
 
         $user = Auth::user();
 
-        return $this->authorizationResponse('Login successful', $token, $user);
+        return $this->authorizationResponse(AuthConstants::LOGIN, $token, $user);
     }
 
+    /**
+     * Create account User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function register(Request $request): JsonResponse
     {
         $request->validate([
@@ -49,25 +65,45 @@ class AuthController extends Controller
         ]);
 
         $token = Auth::login($user);
-        return $this->authorizationResponse('User created successfully', $token, $user);
+        return $this->authorizationResponse(AuthConstants::REGISTER, $token, $user);
     }
 
+    /**
+     * Log out account User with credential token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(): JsonResponse
     {
         Auth::logout();
 
-        return $this->successResponse('Successfully logged out', HTTPCode::HTTP_OK);
+        return $this->successResponse(AuthConstants::LOGOUT, HTTPCode::HTTP_OK);
     }
 
+    /**
+     * Refresh token User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function refresh(): JsonResponse
     {
-        return response()->json([
-            'status' => 'success',
-            'user' => Auth::user(),
-            'authorisation' => [
-                'token' => Auth::refresh(),
-                'type' => 'bearer',
-            ]
-        ]);
+        $user = Auth::user();
+        $token = Auth::refresh();
+
+        return $this->authorizationResponse(AuthConstants::REFRESH, $token, $user);
+    }
+
+    /**
+     * Get the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+
+    public function me(): JsonResponse
+    {
+        $authUser = Auth::user();
+        $user = $authUser->toArray();
+
+        return $this->successResponse(AuthConstants::ME, HTTPCode::HTTP_OK, $user);
     }
 }
