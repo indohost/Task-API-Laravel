@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskListController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +48,25 @@ Route::controller(AuthController::class)
 Route::controller(TaskController::class)
     ->prefix('task')
     ->name('task.')
+    ->middleware(['jwt.verify'])
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{id}', 'show')->name('show');
+
+        Route::patch('/{id}', 'update')->name('update');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+    });
+
+
+/*
+|--------------------------------------------------------------------------
+| Task List
+|--------------------------------------------------------------------------
+*/
+Route::controller(TaskListController::class)
+    ->prefix('task-list')
+    ->name('task-list.')
     ->middleware(['jwt.verify'])
     ->group(function () {
         Route::get('/', 'index')->name('index');
