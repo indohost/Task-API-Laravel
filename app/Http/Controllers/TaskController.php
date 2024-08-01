@@ -38,8 +38,7 @@ class TaskController extends Controller
 
                 if ($keyword) {
                     $builder->orWhere('title', 'like', '%' . $keyword . '%')
-                        ->orWhere('description', 'like', '%' . $keyword . '%')
-                        ->orWhere('status', 'like', '%' . $keyword . '%');
+                        ->orWhere('description', 'like', '%' . $keyword . '%');
                 }
 
                 if ($status) {
@@ -62,7 +61,7 @@ class TaskController extends Controller
             return $this->successResponse(TaskConstants::GET_LIST, HTTPCode::HTTP_OK, $tasks);
         } catch (Exception $e) {
             Log::error([
-                'title' => 'lists task',
+                'title' => 'index task',
                 'message'   => $e->getMessage(),
             ]);
 
@@ -101,6 +100,10 @@ class TaskController extends Controller
                 'title' => 'store task',
                 'message'   => $e->getMessage(),
             ]);
+
+            if ($e instanceof ModelNotFoundException) {
+                return $this->failedResponse(TaskConstants::NO_CONTENT, HTTPCode::HTTP_NO_CONTENT);
+            }
 
             return $this->failedResponse(TaskConstants::INTERNAL_SERVER_ERROR, HTTPCode::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -156,6 +159,10 @@ class TaskController extends Controller
                 'user_id' => $request->user_id,
             ];
 
+            $requestTask = array_filter($requestTask, function ($value) {
+                return !is_null($value) && $value !== '';
+            });
+
             $task = Task::findOrFail($id);
             $task->update($requestTask);
 
@@ -164,9 +171,13 @@ class TaskController extends Controller
             return $this->failedResponse(TaskConstants::NO_CONTENT, HTTPCode::HTTP_NO_CONTENT);
         } catch (Exception $e) {
             Log::error([
-                'title' => 'updated task',
+                'title' => 'update task',
                 'message'   => $e->getMessage(),
             ]);
+
+            if ($e instanceof ModelNotFoundException) {
+                return $this->failedResponse(TaskConstants::NO_CONTENT, HTTPCode::HTTP_NO_CONTENT);
+            }
 
             return $this->failedResponse(TaskConstants::INTERNAL_SERVER_ERROR, HTTPCode::HTTP_INTERNAL_SERVER_ERROR);
         }
