@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Task extends Model
+class TaskList extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $guarded = [];
 
-    public function TaskList()
+    public function Task()
     {
-        return $this->hasMany(TaskList::class, 'task_id', 'id');
+        return $this->belongsTo(Task::class, 'task_id', 'id');
     }
 }
