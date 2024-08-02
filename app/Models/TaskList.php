@@ -13,7 +13,7 @@ class TaskList extends Model
 
     protected $guarded = [];
 
-    public function Task()
+    public function task()
     {
         return $this->belongsTo(Task::class, 'task_id', 'id');
     }
