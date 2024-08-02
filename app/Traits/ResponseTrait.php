@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Symfony\Component\HttpFoundation\Response as HTTPCode;
@@ -18,8 +19,8 @@ trait ResponseTrait
      */
     protected function authorizationResponse(
         string $message = 'Authorization successful',
-        string $token,
-        $user
+        string $token = '',
+        User $user = null,
     ): JsonResponse {
         return response()->json([
             'status' => 'OK',
