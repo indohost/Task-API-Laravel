@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Constants\TaskConstants;
+use App\Enums\Task\StatusTaskEnums;
+use App\Http\Resources\Task\DeleteTaskResources;
+use App\Http\Resources\Task\DetailTaskResources;
+use App\Http\Resources\Task\StoreTaskResources;
+use App\Http\Resources\Task\UpdateTaskResources;
 use App\Models\Task;
 use Carbon\Carbon;
 use Exception;
@@ -11,6 +16,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response as HTTPCode;
 
 class TaskController extends Controller
@@ -23,6 +29,15 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
+        $request->validate([
+            'page' => 'integer',
+            'size' => 'integer',
+            'keyword' => 'string',
+            'start_date' => 'date',
+            'end_date' => 'date|after_or_equal:start_date',
+            'status' => ['string', Rule::in(StatusTaskEnums::getValues())],
+        ]);
+
         try {
             $page = $request->input('page', 1);
             $size = $request->input('size', 10);
@@ -36,13 +51,13 @@ class TaskController extends Controller
                 $startDate = $request->input('start_date');
                 $endDate = $request->input('end_date');
 
+                if ($status) {
+                    $builder->where('status', $status);
+                }
+
                 if ($keyword) {
                     $builder->orWhere('title', 'like', '%' . $keyword . '%')
                         ->orWhere('description', 'like', '%' . $keyword . '%');
-                }
-
-                if ($status) {
-                    $builder->where('status', $status);
                 }
 
                 if ($startDate && $endDate) {
@@ -80,8 +95,8 @@ class TaskController extends Controller
         $request->validate([
             'title' => 'required|string',
             'description' => 'required|string',
-            'status' => 'required|string',
-            'user_id' => 'required|uuid',
+            'status' => ['required', 'string', Rule::in(StatusTaskEnums::getValues())],
+            'user_id' => 'required|uuid|exists:users,id',
         ]);
 
         try {
@@ -94,7 +109,7 @@ class TaskController extends Controller
 
             $task = Task::create($requestTask);
 
-            if ($task) return $this->successResponse(TaskConstants::CREATE, HTTPCode::HTTP_CREATED);
+            if ($task) return $this->successResponse(TaskConstants::CREATE, HTTPCode::HTTP_CREATED, new StoreTaskResources($task));
         } catch (Exception $e) {
             Log::error([
                 'title' => 'store task',
@@ -120,7 +135,7 @@ class TaskController extends Controller
         try {
             $task = Task::findOrFail($id);
 
-            return $this->successResponse(TaskConstants::GET_DETAIL, HTTPCode::HTTP_OK, $task);
+            return $this->successResponse(TaskConstants::GET_DETAIL, HTTPCode::HTTP_OK, new DetailTaskResources($task));
         } catch (Exception $e) {
             Log::error([
                 'title' => 'details task',
@@ -147,8 +162,8 @@ class TaskController extends Controller
         $request->validate([
             'title' => 'string',
             'description' => 'string',
-            'status' => 'string',
-            'user_id' => 'uuid',
+            'status' => ['required', 'string', Rule::in(StatusTaskEnums::getValues())],
+            'user_id' => 'uuid|exists:users,id',
         ]);
 
         try {
@@ -166,7 +181,7 @@ class TaskController extends Controller
             $task = Task::findOrFail($id);
             $task->update($requestTask);
 
-            if (!empty($task->getChanges())) return $this->successResponse(TaskConstants::UPDATE, HTTPCode::HTTP_OK);
+            if (!empty($task->getChanges())) return $this->successResponse(TaskConstants::UPDATE, HTTPCode::HTTP_OK, new UpdateTaskResources($task));
 
             return $this->failedResponse(TaskConstants::NO_CONTENT, HTTPCode::HTTP_NO_CONTENT);
         } catch (Exception $e) {
@@ -194,7 +209,7 @@ class TaskController extends Controller
         try {
             $task = Task::findOrFail($id);
 
-            if ($task->delete()) return $this->successResponse(TaskConstants::DELETE, HTTPCode::HTTP_OK);
+            if ($task->delete()) return $this->successResponse(TaskConstants::DELETE, HTTPCode::HTTP_OK, new DeleteTaskResources($task));
 
             return $this->failedResponse(TaskConstants::NO_CONTENT, HTTPCode::HTTP_NO_CONTENT);
         } catch (Exception $e) {
