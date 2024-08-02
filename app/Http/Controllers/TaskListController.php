@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Constants\TaskListConstants;
 use App\Enums\TaskList\PriorityTaskListEnums;
 use App\Enums\TaskList\StatusTaskListEnums;
+use App\Http\Resources\TaskList\DeleteTaskListResources;
+use App\Http\Resources\TaskList\DetailTaskListResources;
+use App\Http\Resources\TaskList\StoreTaskListResources;
+use App\Http\Resources\TaskList\UpdateTaskListResources;
 use App\Models\TaskList;
 use Carbon\Carbon;
 use Exception;
@@ -123,7 +127,7 @@ class TaskListController extends Controller
 
             $taskList = TaskList::create($requestTaskList);
 
-            if ($taskList) return $this->successResponse(TaskListConstants::CREATE, HTTPCode::HTTP_CREATED);
+            if ($taskList) return $this->successResponse(TaskListConstants::CREATE, HTTPCode::HTTP_CREATED, new StoreTaskListResources($taskList));
         } catch (Exception $e) {
             Log::error([
                 'title' => 'store task list',
@@ -149,7 +153,7 @@ class TaskListController extends Controller
         try {
             $taskList = TaskList::findOrFail($id);
 
-            return $this->successResponse(TaskListConstants::GET_DETAIL, HTTPCode::HTTP_OK, $taskList);
+            return $this->successResponse(TaskListConstants::GET_DETAIL, HTTPCode::HTTP_OK, new DetailTaskListResources($taskList));
         } catch (Exception $e) {
             Log::error([
                 'title' => 'details task list',
@@ -199,7 +203,7 @@ class TaskListController extends Controller
             $taskList = TaskList::findOrFail($id);
             $taskList->update($requestTaskList);
 
-            if (!empty($taskList->getChanges())) return $this->successResponse(TaskListConstants::UPDATE, HTTPCode::HTTP_OK);
+            if (!empty($taskList->getChanges())) return $this->successResponse(TaskListConstants::UPDATE, HTTPCode::HTTP_OK, new UpdateTaskListResources($taskList));
 
             return $this->failedResponse(TaskListConstants::NO_CONTENT, HTTPCode::HTTP_NO_CONTENT);
         } catch (Exception $e) {
@@ -227,7 +231,7 @@ class TaskListController extends Controller
         try {
             $taskList = TaskList::findOrFail($id);
 
-            if ($taskList->delete()) return $this->successResponse(TaskListConstants::DELETE, HTTPCode::HTTP_OK);
+            if ($taskList->delete()) return $this->successResponse(TaskListConstants::DELETE, HTTPCode::HTTP_OK, new DeleteTaskListResources($taskList));
 
             return $this->failedResponse(TaskListConstants::NO_CONTENT, HTTPCode::HTTP_NO_CONTENT);
         } catch (Exception $e) {
