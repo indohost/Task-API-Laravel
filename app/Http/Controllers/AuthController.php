@@ -56,16 +56,18 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
+            'is_test' => 'boolean',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'is_test' => $request->is_test,
         ]);
 
         $token = Auth::login($user);
-        return $this->authorizationResponse(AuthConstants::REGISTER, $token, $user);
+        return $this->authorizationResponse(AuthConstants::REGISTER, $token, $user, HTTPCode::HTTP_CREATED);
     }
 
     /**

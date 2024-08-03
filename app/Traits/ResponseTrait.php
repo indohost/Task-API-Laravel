@@ -21,6 +21,7 @@ trait ResponseTrait
         string $message = 'Authorization successful',
         string $token = '',
         User $user = null,
+        int $status = HTTPCode::HTTP_OK,
     ): JsonResponse {
         return response()->json([
             'status' => 'OK',
@@ -30,7 +31,7 @@ trait ResponseTrait
                 'token' => $token,
             ],
             'user'    => $user,
-        ], HTTPCode::HTTP_OK);
+        ], $status);
     }
 
     /**
