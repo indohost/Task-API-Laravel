@@ -25,6 +25,8 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'photo_path',
+        'is_test',
     ];
 
     /**
@@ -45,12 +47,14 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_test' => 'boolean',
     ];
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      */
-    public function getJWTIdentifier(){
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
 
@@ -60,7 +64,8 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return array
      */
-    public function getJWTCustomClaims(){
+    public function getJWTCustomClaims()
+    {
         return [];
     }
 }
