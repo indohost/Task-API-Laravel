@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Constants\HandlerConstants;
+use App\Traits\MakesHttpRequests;
 use App\Traits\ResponseTrait;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
@@ -10,7 +11,7 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    use ResponseTrait;
+    use ResponseTrait, MakesHttpRequests;
     /**
      * The list of the inputs that are never flashed to the session on validation exceptions.
      *
@@ -40,5 +41,4 @@ class Handler extends ExceptionHandler
 
         return parent::render($request, $exception);
     }
-
 }
