@@ -33,7 +33,7 @@ class TaskApiTest extends TestCase
             'description' => 'Task description',
             'status' => 'opened',
             'user_id' => $this->user['id'],
-            'is_test' => false,
+            'is_test' => true,
         ];
 
         return $dataTask;
