@@ -97,6 +97,7 @@ class TaskController extends Controller
             'description' => 'required|string',
             'status' => ['required', 'string', Rule::in(StatusTaskEnums::getValues())],
             'user_id' => 'required|uuid|exists:users,id',
+            'is_test' => 'boolean',
         ]);
 
         try {
@@ -105,6 +106,7 @@ class TaskController extends Controller
                 'description' => $request->description,
                 'status' => $request->status,
                 'user_id' => $request->user_id,
+                'is_test' => $request->is_test,
             ];
 
             $task = Task::create($requestTask);
