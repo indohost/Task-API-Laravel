@@ -68,6 +68,7 @@ class TaskController extends Controller
             });
 
             $tasks = $tasks->latest()
+                ->with(['user', 'taskList'])
                 ->paginate(
                     perPage: $size,
                     page: $page
@@ -106,7 +107,7 @@ class TaskController extends Controller
                 'description' => $request->description,
                 'status' => $request->status,
                 'user_id' => $request->user_id,
-                'is_test' => $request->is_test,
+                'is_test' => $request->is_test ?? false,
             ];
 
             $task = Task::create($requestTask);
