@@ -17,6 +17,7 @@ class StoreTaskListResources extends JsonResource
         $taskResource = [
             'id' => $this->id,
             'title' => $this->title,
+            'description' => $this->description,
             'due_date' => $this->due_date,
             'priority' => $this->priority,
             'status' => $this->status,

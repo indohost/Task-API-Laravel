@@ -51,7 +51,7 @@ class TaskApiTest extends TestCase
      * @test
      * 
      * Given: Menyiapkan pengguna (User) dan data tugas yang valid.
-     * When: Mengirimkan permintaan POST ke endpoint /api/tasks dengan data tersebut.
+     * When: Mengirimkan permintaan POST ke endpoint /api/task dengan data tersebut.
      * Then: Memastikan bahwa respons memiliki status sukses (201), tugas disimpan di database, dan respons berisi data tugas yang dibuat.
 
      */
@@ -88,7 +88,7 @@ class TaskApiTest extends TestCase
      * @test
      *  
      * Given: Task yang ada di database.
-     * When: Mengirim permintaan PUT ke /api/tasks/{id} untuk memperbarui task.
+     * When: Mengirim permintaan PUT ke /api/task/{id} untuk memperbarui task.
      * Then: Memeriksa bahwa respons adalah 200 dan data task diperbarui di database.
      * 
      */
@@ -125,14 +125,14 @@ class TaskApiTest extends TestCase
 
     /** @test 
      * 
-     * Given: Menghasilkan user dan beberapa task menggunakan factory.
-     * When: Mengirimkan permintaan GET ke endpoint /api/tasks dengan parameter yang valid dan header Authorization yang berisi token JWT.
+     * Given: Menghasilkan beberapa Task menggunakan factory.
+     * When: Mengirimkan permintaan GET ke endpoint /api/task dengan parameter yang valid dan header Authorization yang berisi token JWT.
      * Then: Memastikan respons memiliki status sukses (200) dan memverifikasi struktur JSON respons yang berisi data task.
      * 
      */
     public function it_searches_tasks_with_valid_parameters(): void
     {
-        // Given we have a user and some tasks
+        // Given we have some task
         Task::factory()->count(10)->create([
             'user_id' => $this->user->id,
         ]);
@@ -194,14 +194,14 @@ class TaskApiTest extends TestCase
 
     /** @test
      * 
-     * Given: Menghasilkan user.
-     * When: Mengirimkan permintaan GET ke endpoint /api/tasks/search dengan parameter status yang tidak valid.
+     * Given: Menghasilkan beberapa Task menggunakan factory.
+     * When: Mengirimkan permintaan GET ke endpoint /api/task dengan parameter status yang tidak valid.
      * Then: Memastikan respons memiliki status error validasi (422).
      * 
      */
     public function it_fails_search_with_invalid_status(): void
     {
-        // Given we have a user and some tasks
+        // Given we have some task
         Task::factory()->count(10)->create([
             'user_id' => $this->user->id,
         ]);
@@ -226,7 +226,7 @@ class TaskApiTest extends TestCase
     /** @test
      * 
      * Given: Task yang ada di database.
-     * When: Mengirim permintaan DELETE ke /api/tasks/{id}.
+     * When: Mengirim permintaan DELETE ke /api/task/{id}.
      * Then: Memeriksa bahwa respons adalah 200 dan task dihapus dari database.
      * 
      */

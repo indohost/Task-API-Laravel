@@ -113,6 +113,7 @@ class TaskListController extends Controller
             'priority' => ['required', 'string', Rule::in(PriorityTaskListEnums::getValues())],
             'status' => ['required', 'string', Rule::in(StatusTaskListEnums::getValues())],
             'task_id' => 'required|uuid|exists:tasks,id',
+            'is_test' => 'boolean',
         ]);
 
         try {
@@ -123,6 +124,7 @@ class TaskListController extends Controller
                 'priority' => $request->priority,
                 'status' => $request->status,
                 'task_id' => $request->task_id,
+                'is_test' => (bool) $request?->is_test,
             ];
 
             $taskList = TaskList::create($requestTaskList);
