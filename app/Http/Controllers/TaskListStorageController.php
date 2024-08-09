@@ -79,6 +79,7 @@ class TaskListStorageController extends Controller
         $request->validate([
             'file' => 'required|file|mimes:jpeg,jpg,png,pdf|max:2048',
             'task_list_id' => 'required|uuid|exists:task_lists,id',
+            'is_test' => 'boolean',
         ]);
 
         try {
@@ -105,6 +106,7 @@ class TaskListStorageController extends Controller
                 'type' => $fileExtension,
                 'path' => $filePath,
                 'task_list_id' => $request->task_list_id,
+                'is_test' => (bool) $request?->is_test,
             ];
 
             $taskListStorage = TaskListStorage::create($requestTaskListStorage);
